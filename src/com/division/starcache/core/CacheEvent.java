@@ -117,6 +117,7 @@ public class CacheEvent {
     }
 
     public void abortEvent() {
+        starCache.setType(Material.CHEST);
         Chest contents = (Chest) starCache.getState();
         contents.getBlockInventory().clear();
         starCache.setType(Material.AIR);
@@ -126,6 +127,7 @@ public class CacheEvent {
     }
 
     public void cleanup() {
+        starCache.setType(Material.CHEST);
         Chest cache = (Chest) starCache.getState();
         cache.getBlockInventory().clear();
         starCache.setType(Material.AIR);

@@ -1,10 +1,14 @@
 package com.division.starcache.core;
 
-import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.entity.Board;
+import com.massivecraft.factions.entity.BoardColl;
+import com.massivecraft.massivecore.ps.PS;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -51,10 +55,10 @@ public class CacheEvent {
         }
         Chunk chunk = cacheBlock.getChunk();
         if (config.isUsingFactions()) {
-            while (Board.getFactionAt(new FLocation(cacheBlock)) != Factions.i.getNone()) {
-                cacheBlock = getCacheLocation();
-                chunk = cacheBlock.getChunk();
-            }
+           while(!checkLocation(chunk)){
+               cacheBlock = getCacheLocation();
+               chunk = cacheBlock.getChunk();
+           }
         }
         cacheBlock.setType(Material.CHEST);
         Chest chest = (Chest) cacheBlock.getState();
@@ -74,13 +78,25 @@ public class CacheEvent {
         this.eventStarted = true;
     }
 
+    public boolean checkLocation(Chunk chunk) {
+        Set<PS> chunks = BoardColl.getNearbyChunks(PS.valueOf(chunk), 2);
+        Iterator<PS> iter = chunks.iterator();
+        while (iter.hasNext()) {
+            PS nChunk = iter.next();
+            if (!BoardColl.get().getFactionAt(nChunk).getId().equals(Factions.ID_NONE)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void startUnlockStage() {
         this.unlockStage = true;
         this.unlockStageStart = System.currentTimeMillis();
     }
 
     public void clearArea() {
-        Player[] ents = Bukkit.getServer().getOnlinePlayers();
+        Collection<? extends Player> ents = Bukkit.getServer().getOnlinePlayers();
         starCache.getWorld().createExplosion(starCache.getLocation(), 0.0F);
         for (Player player : ents) {
             if (player.equals(winner)) {

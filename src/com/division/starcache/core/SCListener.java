@@ -25,7 +25,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class SCListener implements Listener {
 
     private StarCache sC;
-    
 
     public SCListener(StarCache instance) {
         this.sC = instance;
@@ -38,10 +37,11 @@ public class SCListener implements Listener {
         if (cacheEvent == null || !cacheEvent.isActive()) {
             return;
         }
-        Block evtBlock = evt.getBlock();
-        if (evtBlock.equals(cacheEvent.getStarCache())) {
+        Chunk eventChunk = cacheEvent.getEventChunk();
+        Chunk chunk = evt.getBlock().getChunk();
+        if (Math.abs(eventChunk.getX() - chunk.getX()) <= 2 && Math.abs(eventChunk.getZ() - chunk.getZ()) <= 2) {
             evt.setCancelled(true);
-            evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot break the StarCache."));
+            evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot break blocks near the StarCache's chunk."));
         }
     }
 
@@ -53,9 +53,9 @@ public class SCListener implements Listener {
         }
         Chunk eventChunk = cacheEvent.getEventChunk();
         Chunk chunk = evt.getBlock().getChunk();
-        if (chunk == eventChunk) {
+        if (Math.abs(eventChunk.getX() - chunk.getX()) <= 2 && Math.abs(eventChunk.getZ() - chunk.getZ()) <= 2) {
             evt.setCancelled(true);
-            evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot place blocks in the StarCache's chunk."));
+            evt.getPlayer().sendMessage(String.format(StarCache.chatFormat, "You cannot place blocks near the StarCache's chunk."));
         }
     }
 
@@ -66,7 +66,7 @@ public class SCListener implements Listener {
         }
         Block evtBlock = evt.getClickedBlock();
         final CacheEvent cacheEvent = sC.getCacheEvent();
-        if(cacheEvent == null){
+        if (cacheEvent == null) {
             return;
         }
         if (!cacheEvent.isActive()) {

@@ -35,7 +35,7 @@ public class StarCache extends JavaPlugin {
         this.getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override
             public void run() {
-                if (cacheEvent == null || cacheEvent.isActive() == false) {
+                if (cacheEvent == null || !cacheEvent.isActive()) {
                     return;
                 }
                 Bukkit.getServer().broadcastMessage(String.format(chatFormat, getAnnouncerMessage()));
